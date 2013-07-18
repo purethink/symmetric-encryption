@@ -55,6 +55,7 @@ module ActiveRecord #:nodoc:
             def #{attribute}
               if @stored_encrypted_#{attribute} != self.encrypted_#{attribute}
                 @#{attribute} = ::SymmetricEncryption.decrypt(self.encrypted_#{attribute}).freeze
+                @#{attribute} =  YAML::load(@#{attribute}) if #{marshal} && #{!attribute.to_s.empty?}
                 @stored_encrypted_#{attribute} = self.encrypted_#{attribute}
               end
               @#{attribute}

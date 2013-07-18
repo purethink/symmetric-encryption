@@ -18,6 +18,7 @@ ActiveRecord::Base.establish_connection('test')
 
 ActiveRecord::Schema.define :version => 0 do
   create_table :users, :force => true do |t|
+    t.string :encrypted_birth_date
     t.string :encrypted_bank_account_number
     t.string :encrypted_social_security_number
     t.string :encrypted_string
@@ -27,6 +28,7 @@ ActiveRecord::Schema.define :version => 0 do
 end
 
 class User < ActiveRecord::Base
+  attr_encrypted :birth_date, :random_iv => true, :marshal => true
   attr_encrypted :bank_account_number
   attr_encrypted :social_security_number
   attr_encrypted :string,      :random_iv => true
@@ -55,6 +57,7 @@ class AttrEncryptedTest < Test::Unit::TestCase
   context 'the SymmetricEncryption Library' do
 
     setup do
+      @birth_date = Time.now
       @bank_account_number = "1234567890"
       @bank_account_number_encrypted = "L94ArJeFlJrZp6SYsvoOGA=="
 
@@ -71,11 +74,13 @@ class AttrEncryptedTest < Test::Unit::TestCase
         :bank_account_number    => @bank_account_number,
         # Encrypted Attribute
         :social_security_number => @social_security_number,
-        :name                   => @name
+        :name                   => @name,
+        :birth_date             => @birth_date
       )
     end
 
     should "have encrypted methods" do
+      assert_equal true, @user.respond_to?(:encrypted_birth_date)
       assert_equal true, @user.respond_to?(:encrypted_bank_account_number)
       assert_equal true, @user.respond_to?(:bank_account_number)
       assert_equal true, @user.respond_to?(:encrypted_social_security_number)
@@ -83,6 +88,25 @@ class AttrEncryptedTest < Test::Unit::TestCase
       assert_equal false, @user.respond_to?(:encrypted_name)
     end
 
+
+    should "have marshalled unencrypted values" do
+       assert @user.birth_date.is_a? Time
+       assert_equal @birth_date, @user.birth_date
+       @user2 = User.new(
+         # Encrypted Attribute
+         :bank_account_number    => @bank_account_number,
+         # Encrypted Attribute
+         :social_security_number => @social_security_number,
+         :name                   => @name,
+         :birth_date             => nil
+       )
+       
+       assert @user2.birth_date.nil?
+       
+       
+        
+    end
+    
     should "have unencrypted values" do
       assert_equal @bank_account_number, @user.bank_account_number
       assert_equal @social_security_number, @user.social_security_number
