@@ -98,6 +98,9 @@ class AttrEncryptedTest < Test::Unit::TestCase
        
        assert @user2.birth_date.class.name == 'Date'
        assert @user2.birth_date.year == 2013 
+       assert !@user2.encrypted_birth_date.empty?
+       
+       assert SymmetricEncryption.try_decrypt(@user2.encrypted_birth_date) == @user2.birth_date.to_yaml
     end
     
     
