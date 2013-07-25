@@ -28,7 +28,9 @@ ActiveRecord::Schema.define :version => 0 do
 end
 
 class User < ActiveRecord::Base
-  attr_encrypted :birth_date, :random_iv => true, :marshal => true
+  attr_encrypted :birth_date, :random_iv => true, :marshal => true, :type => :date
+  attr_encrypted :bad_date, :random_iv => true, :marshal => true, :type => :baddate
+  
   attr_encrypted :bank_account_number
   attr_encrypted :social_security_number
   attr_encrypted :string,      :random_iv => true
@@ -86,6 +88,29 @@ class AttrEncryptedTest < Test::Unit::TestCase
       assert_equal true, @user.respond_to?(:encrypted_social_security_number)
       assert_equal true, @user.respond_to?(:social_security_number)
       assert_equal false, @user.respond_to?(:encrypted_name)
+    end
+    
+    
+    should "allow for multiparameter assignment for dates" do
+       @user2 = User.new(
+         "birth_date(1i)"=>"2013", "birth_date(2i)"=>"7", "birth_date(3i)"=>"25", "birth_date(4i)"=>"", "birth_date(5i)"=>""
+       )
+       
+       assert @user2.birth_date.class.name == 'Date'
+       assert @user2.birth_date.year == 2013 
+    end
+    
+    
+    should " raise a multiparameter assignment error for attribute not defined with a date type" do
+    
+       exception = assert_raise(ActiveRecord::MultiparameterAssignmentErrors) {
+          @user2 = User.new(
+            "bad_date(1i)"=>"2013", "bad_date(2i)"=>"7", "bad_date(3i)"=>"25", "bad_date(4i)"=>"", "bad_date(5i)"=>""
+          )
+       }
+       
+      
+     
     end
 
 

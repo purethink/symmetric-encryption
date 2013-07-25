@@ -45,10 +45,25 @@ module ActiveRecord #:nodoc:
         random_iv = options.fetch(:random_iv, false)
         compress  = options.fetch(:compress, false)
         marshal   = options.fetch(:marshal, false)
+        type_sym = options.fetch(:type, nil)
+        
+        
+       
 
         params.each do |attribute|
+          
+           case type_sym # a_variable is the variable we want to compare
+             when :date, :datetime  
+               composed_of_str = "composed_of :#{attribute}, :class_name => 'Date',:mapping => %w(Date to_s), :constructor => Proc.new { |date| (date && date.to_date) || Date.today },:converter => Proc.new { |value| value.to_s.to_date }"
+             else
+               composed_of_str = ""
+           end
+          
           # Generate unencrypted attribute with getter and setter
           class_eval(<<-UNENCRYPTED, __FILE__, __LINE__ + 1)
+          
+            #{composed_of_str}
+            
             # Returns the decrypted value for the encrypted attribute
             # The decrypted value is cached and is only decrypted if the encrypted value has changed
             # If this method is not called, then the encrypted value is never decrypted
