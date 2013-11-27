@@ -53,8 +53,11 @@ module ActiveRecord #:nodoc:
         params.each do |attribute|
           
            case type_sym # a_variable is the variable we want to compare
-             when :date, :datetime  
+             when :date
                composed_of_str = "composed_of :#{attribute}, :class_name => 'Date',:mapping => %w(Date to_s), :constructor => Proc.new { |date| (date && date.to_date) || Date.today },:converter => Proc.new { |value| value.to_s.to_date }"
+             when :datetime  
+               composed_of_str = "composed_of :#{attribute}, :class_name => 'DateTime',:mapping => %w(DateTime to_s), :constructor => Proc.new { |date| (date && date.to_datetime) || DateTime.now },:converter => Proc.new { |value| value.to_s.to_datetime }"
+               
              else
                composed_of_str = ""
            end
