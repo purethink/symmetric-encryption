@@ -14,6 +14,6 @@ group :test do
 
   # Use Mongo as the database with Mongoid as the Object Document Mapper
   # Edge has support for Rails 4
-  gem 'mongoid', git: 'https://github.com/mongoid/mongoid.git'
+  gem 'mongoid', git: 'https://github.com/mongoid/mongoid.git', tag: 'v4.0.0.beta1'
   gem 'awesome_print'
 end

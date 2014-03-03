@@ -73,7 +73,17 @@ module ActiveRecord #:nodoc:
             def #{attribute}
               if @stored_encrypted_#{attribute} != self.encrypted_#{attribute}
                 @#{attribute} = ::SymmetricEncryption.decrypt(self.encrypted_#{attribute}).freeze
-                @#{attribute} =  YAML::load(@#{attribute}) if #{marshal} && #{!attribute.to_s.empty?}
+                if #{!attribute.to_s.empty?}
+                  if #{marshal}
+                    @#{attribute} =  YAML::load(@#{attribute})
+                  else
+                    @#{attribute} = @#{attribute}.to_s.to_date if #{type_sym == :date}
+                    @#{attribute} = @#{attribute}.to_s.to_datetime if #{type_sym == :datetime}
+                  end
+                end
+                
+                
+                
                 @stored_encrypted_#{attribute} = self.encrypted_#{attribute}
               end
               @#{attribute}
